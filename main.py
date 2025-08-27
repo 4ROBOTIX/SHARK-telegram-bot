@@ -1,49 +1,46 @@
 import os
 import logging
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
-
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 from knowledge.qa import get_answer
-from logs.logger import log_unanswered, log_interaction
+from logs.logger import log_interaction, log_unanswered
 
-# Nastavení logování
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
+# Logging
+logging.basicConfig(level=logging.INFO)
 
-# Získání tokenu a webhook URL
+# Načtení proměnných
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-RENDER_EXTERNAL_URL = os.environ["RENDER_EXTERNAL_URL"]
+RENDER_EXTERNAL_URL = os.environ["RENDER_EXTERNAL_URL"]  # např. shark-telegram-bot.onrender.com
+WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]  # např. shark-secret
 
-# Vytvoření aplikace
-application = Application.builder().token(BOT_TOKEN).build()
-
-# Základní příkaz /start
+# Funkce pro příkaz /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Ahoj! Jsem SHARK support bot. Zeptej se mě na cokoliv ohledně SHARK EA.")
+    await update.message.reply_text("Ahoj! Jsem SHARK EA asistent. Zeptej se mě na cokoliv ohledně systému.")
 
-# Zpracování běžných zpráv
+# Funkce pro zpracování zpráv
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_question = update.message.text
-    user_id = update.message.from_user.id
+    user_message = update.message.text
+    chat_id = update.effective_chat.id
+    logging.info(f"Zpráva od {chat_id}: {user_message}")
 
-    answer = get_answer(user_question)
+    answer = get_answer(user_message)
 
     if answer:
         await update.message.reply_text(answer)
-        log_interaction(user_id, user_question, answer)
+        log_interaction(chat_id, user_message, answer)
     else:
-        await update.message.reply_text("Promiň, na tohle zatím neznám odpověď. Přepošlu to týmu.")
-        log_unanswered(user_id, user_question)
+        await update.message.reply_text("Omlouvám se, na tohle zatím nemám odpověď.")
+        log_unanswered(chat_id, user_message)
 
-# Registrace handlerů
+# Inicializace aplikace
+application = ApplicationBuilder().token(BOT_TOKEN).build()
+
 application.add_handler(CommandHandler("start", start))
 application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-# Webhook mód pro Render
+# Spuštění bota přes webhook
 application.run_webhook(
     listen="0.0.0.0",
     port=int(os.environ.get("PORT", 8443)),
-    webhook_secret_path = os.environ.get("WEBHOOK_SECRET_PATH", "shark-secret")
-    webhook_url = f"https://{RENDER_EXTERNAL_URL}/webhook/{webhook_secret_path}"
+    webhook_url=f"https://{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}"
 )
