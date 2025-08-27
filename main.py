@@ -1,57 +1,48 @@
-import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, CommandHandler, filters
-from config import TELEGRAM_BOT_TOKEN, LANG_DEFAULT, HUMAN_TRIGGER_KEYWORDS
+from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
+
 from knowledge.qa import get_answer
 from logs.logger import log_unanswered, log_interaction
 
-user_flags = {}
+# Nastavení logování
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
 
+# Získání tokenu a webhook URL
+BOT_TOKEN = os.environ["BOT_TOKEN"]
+RENDER_EXTERNAL_URL = os.environ["RENDER_EXTERNAL_URL"]
+
+# Vytvoření aplikace
+application = Application.builder().token(BOT_TOKEN).build()
+
+# Základní příkaz /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Ahoj! 🤖 Jsem SHARK Support Bot. Ptej se mě na cokoliv ohledně nastavení nebo funkcí.")
+    await update.message.reply_text("Ahoj! Jsem SHARK support bot. Zeptej se mě na cokoliv ohledně SHARK EA.")
 
-async def language(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Zatím umím jen česky 🇨🇿. Angličtina je v přípravě.")
-
-async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_flags[update.effective_user.id] = False
-    await update.message.reply_text("Pokračujeme! Jsem zpět.")
-
+# Zpracování běžných zpráv
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    message = update.message.text
+    user_question = update.message.text
+    user_id = update.message.from_user.id
 
-    if any(k.lower() in message.lower() for k in HUMAN_TRIGGER_KEYWORDS):
-        user_flags[user_id] = True
-        await update.message.reply_text("Rozumím. Předávám tě kolegovi. Ozve se ti co nejdřív.")
-        print(f"[PŘEPOJENO] Uživatel @{update.effective_user.username} požaduje ruční pomoc: {message}")
-        return
+    answer = get_answer(user_question)
 
-    if user_flags.get(user_id):
-        await update.message.reply_text("Prosím vyčkej na kolegu...")
-        return
-
-    answer = get_answer(message)
     if answer:
         await update.message.reply_text(answer)
+        log_interaction(user_id, user_question, answer)
     else:
-        await update.message.reply_text("Tuhle odpověď zatím neznám. Předávám si ji dál k doplnění.")
-        log_unanswered(update.effective_user.username, message)
-    log_interaction(update.effective_user.username, message, answer or "Neznámá otázka")
+        await update.message.reply_text("Promiň, na tohle zatím neznám odpověď. Přepošlu to týmu.")
+        log_unanswered(user_id, user_question)
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("language", language))
-    app.add_handler(CommandHandler("resume", resume))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    application.run_webhook(
-        listen="0.0.0.0",
-        port=int(os.environ.get("PORT", 8443)),
-        webhook_url=f"https://{your_render_service_url}/webhook/{bot_token}"
-    )
+# Registrace handlerů
+application.add_handler(CommandHandler("start", start))
+application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+# Webhook mód pro Render
+application.run_webhook(
+    listen="0.0.0.0",
+    port=int(os.environ.get("PORT", 8443)),
+    webhook_url=f"https://{RENDER_EXTERNAL_URL}/webhook/{BOT_TOKEN}"
+)
