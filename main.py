@@ -43,5 +43,5 @@ print(f"Webhook URL: https://{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}
 application.run_webhook(
     listen="0.0.0.0",
     port=int(os.environ.get("PORT", 8443)),
-    webhook_url=f"https://{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}"
+    webhook_url=f"{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}"
 )
