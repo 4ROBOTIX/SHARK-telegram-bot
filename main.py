@@ -39,7 +39,7 @@ application.add_handler(CommandHandler("start", start))
 application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
 # Spuštění bota přes webhook
-print(f"Webhook URL: https://{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
+print(f"Webhook URL: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
 application.run_webhook(
     listen="0.0.0.0",
     port=int(os.environ.get("PORT", 8443)),
