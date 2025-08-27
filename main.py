@@ -44,5 +44,6 @@ application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_m
 application.run_webhook(
     listen="0.0.0.0",
     port=int(os.environ.get("PORT", 8443)),
-    webhook_url=f"https://{RENDER_EXTERNAL_URL}/webhook/{BOT_TOKEN}"
+    webhook_secret_path = os.environ.get("WEBHOOK_SECRET_PATH", "shark-secret")
+    webhook_url = f"https://{RENDER_EXTERNAL_URL}/webhook/{webhook_secret_path}"
 )
