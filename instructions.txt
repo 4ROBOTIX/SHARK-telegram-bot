@@ -1,5 +1,0 @@
-Co je GtRSI?
-GtRSI je indikátor pro vstup do gridových obchodů podle RSI.
-
-Jak funguje AutoClose?
-AutoClose zavírá nejstarší obchody, když je dosažen maximální počet obchodů v sérii.
