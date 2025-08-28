@@ -1,5 +1,4 @@
 import os
-import asyncio
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
@@ -14,7 +13,7 @@ WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]
 
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Ahoj! Jsem SHARK asistent. Zeptej se mě na cokoliv o systému.")
+    await update.message.reply_text("Ahoj! Jsem Rafael, 4ROBOTIX asistent. Jak mohu pomoci?.")
 
 # běžné zprávy
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -29,23 +28,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Omlouvám se, na to zatím neznám odpověď.")
         log_unanswered(update.message.from_user.username, user_input)
 
-async def main():
-    print(f"Webhook URL test 2: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
+# hlavní část (není async!)
+if __name__ == "__main__":
+    print(f"Webhook URL test 3: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Nastavení webhooku
-    await app.bot.set_webhook(url=f"{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
-
-    # Spuštění webhooku
-    await app.run_webhook(
+    app.run_webhook(
         listen="0.0.0.0",
         port=int(os.environ.get("PORT", 10000)),
-        webhook_url=f"{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}"
+        webhook_url=f"{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}",
     )
-
-if __name__ == "__main__":
-    asyncio.run(main())
