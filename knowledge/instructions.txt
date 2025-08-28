@@ -1,4 +1,4 @@
-Shark?
+Shark
 Shark je automatický obchodní systém (Expert Advisor) od 4ROBOTIX.
 
 GtRSI
