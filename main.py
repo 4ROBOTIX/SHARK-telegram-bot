@@ -1,4 +1,4 @@
-print("==== SPUŠTĚNA VERZE TEST 18 ====")
+print("==== SPUŠTĚNA VERZE TEST 19 ====")
 
 import os
 import logging
@@ -59,19 +59,29 @@ flask_app = Flask(__name__)
 # === Zajištění inicializace Application ===
 is_initialized = False
 
-@flask_app.route(f"/webhook/{WEBHOOK_SECRET_PATH}", methods=["POST"])
-async def webhook():
-    global is_initialized
-    if not is_initialized:
-        await app.initialize()  # 🔧 nutné pro webhook
-        is_initialized = True
+# Globální loop
+loop = asyncio.get_event_loop()
 
-    data = request.get_json(force=True)
-    update = Update.de_json(data, app.bot)
-    await app.process_update(update)
-    return "OK"
+@flask_app.route(f"/webhook/{WEBHOOK_SECRET_PATH}", methods=["POST"])
+def webhook():
+    if request.method == "POST":
+        data = request.get_json(force=True)
+        update = Update.de_json(data, app.bot)
+
+        # Spuštění async úlohy bezpečně v hlavní asyncio smyčce
+        asyncio.run_coroutine_threadsafe(app.process_update(update), loop)
+
+        return "OK"
 
 # === Spuštění Flask serveru ===
 if __name__ == "__main__":
+    import threading
+
+    # Spusť asyncio loop ve vlákně
+    def run_loop():
+        loop.run_forever()
+
+    threading.Thread(target=run_loop).start()
+
     port = int(os.environ.get("PORT", 10000))
     flask_app.run(host="0.0.0.0", port=port)
