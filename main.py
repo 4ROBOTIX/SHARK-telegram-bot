@@ -1,47 +1,41 @@
 import os
-import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 from knowledge.qa import get_answer
 from logs.logger import log_interaction, log_unanswered
 
-# Logging
-logging.basicConfig(level=logging.INFO)
-
-# Načtení proměnných
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-RENDER_EXTERNAL_URL = os.environ["RENDER_EXTERNAL_URL"]  # např. shark-telegram-bot.onrender.com
-WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]  # např. shark-secret
+RENDER_EXTERNAL_URL = os.environ["RENDER_EXTERNAL_URL"]
+WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]
 
-# Funkce pro příkaz /start
+# Handler for /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Ahoj! Jsem SHARK EA asistent. Zeptej se mě na cokoliv ohledně systému.")
+    await update.message.reply_text("Ahoj! Jsem SHARK asistent. Zeptej se mě na cokoliv o systému.")
 
-# Funkce pro zpracování zpráv
+# Handler for all text messages
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_message = update.message.text
-    chat_id = update.effective_chat.id
-    logging.info(f"Zpráva od {chat_id}: {user_message}")
+    user_input = update.message.text
+    answer = get_answer(user_input)
 
-    answer = get_answer(user_message)
+    log_interaction(update.message.from_user.username, user_input, answer)
 
     if answer:
         await update.message.reply_text(answer)
-        log_interaction(chat_id, user_message, answer)
     else:
-        await update.message.reply_text("Omlouvám se, na tohle zatím nemám odpověď.")
-        log_unanswered(chat_id, user_message)
+        await update.message.reply_text("Omlouvám se, na to zatím neznám odpověď.")
+        log_unanswered(update.message.from_user.username, user_input)
 
-# Inicializace aplikace
-application = ApplicationBuilder().token(BOT_TOKEN).build()
+if __name__ == "__main__":
+    print(f"Webhook URL: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
 
-application.add_handler(CommandHandler("start", start))
-application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-# Spuštění bota přes webhook
-print(f"Webhook URL: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
-application.run_webhook(
-    listen="0.0.0.0",
-    port=int(os.environ.get("PORT", 8443)),
-    webhook_url=f"{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}"
-)
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    # Run the webhook and keep app running
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=int(os.environ.get("PORT", 10000)),
+        webhook_url=f"{RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}"
+    )
