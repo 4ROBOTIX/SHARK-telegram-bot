@@ -1,4 +1,4 @@
-print("==== SPUŠTĚNA VERZE TEST 9 ====")
+print("==== SPUŠTĚNA VERZE TEST 10 ====")
 
 import os
 import nest_asyncio
@@ -69,7 +69,10 @@ if __name__ == "__main__":
     print(f"Webhook URL: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
     
     import asyncio
-    asyncio.get_event_loop().run_until_complete(main())
+    import nest_asyncio
+    nest_asyncio.apply()
+
+    asyncio.run(main())
     
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     
