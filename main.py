@@ -1,4 +1,4 @@
-print("==== SPUŠTĚNA VERZE TEST 15 ====")
+print("==== SPUŠTĚNA VERZE TEST 16 ====")
 
 import os
 import logging
