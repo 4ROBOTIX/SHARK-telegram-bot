@@ -1,4 +1,4 @@
-print("==== SPUŠTĚNA VERZE TEST 11 ====")
+print("==== SPUŠTĚNA VERZE TEST 12 ====")
 
 import os
 import nest_asyncio
@@ -66,4 +66,5 @@ async def main():
 # spouštěcí bod
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
