@@ -1,4 +1,4 @@
-print("==== SPUŠTĚNA VERZE TEST 17 ====")
+print("==== SPUŠTĚNA VERZE TEST 18 ====")
 
 import os
 import logging
@@ -20,8 +20,8 @@ WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]
 logging.basicConfig(level=logging.INFO)
 
 # === Vytvoření telegramové aplikace ===
-request = HTTPXRequest(http_version="1.1")
-app = Application.builder().token(BOT_TOKEN).request(request).build()
+telegram_request = HTTPXRequest(http_version="1.1")  # ✅ Jiný název proměnné
+app = Application.builder().token(BOT_TOKEN).request(telegram_request).build()
 
 # === Telegram Handlers ===
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
