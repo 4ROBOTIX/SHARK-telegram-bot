@@ -61,7 +61,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
 # hlavní část (není async!)
 if __name__ == "__main__":
-    print(f"Webhook URL test 6: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
+    print(f"Webhook URL test 7: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
     
     import asyncio
     asyncio.run(main())
