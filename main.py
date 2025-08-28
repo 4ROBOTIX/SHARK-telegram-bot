@@ -1,4 +1,4 @@
-print("==== SPUŠTĚNA VERZE TEST 16 ====")
+print("==== SPUŠTĚNA VERZE TEST 17 ====")
 
 import os
 import logging
@@ -20,7 +20,7 @@ WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]
 logging.basicConfig(level=logging.INFO)
 
 # === Vytvoření telegramové aplikace ===
-request = HTTPXRequest(pool_limits=10)  # 10 současných spojení místo výchozích 100ms timeoutů
+request = HTTPXRequest(http_version="1.1")
 app = Application.builder().token(BOT_TOKEN).request(request).build()
 
 # === Telegram Handlers ===
