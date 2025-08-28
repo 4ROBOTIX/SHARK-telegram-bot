@@ -26,7 +26,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log_unanswered(update.message.from_user.username, user_input)
 
 if __name__ == "__main__":
-    print(f"Webhook URL: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
+    print(f"Webhook URL: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH} test")
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
