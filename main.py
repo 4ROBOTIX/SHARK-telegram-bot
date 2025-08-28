@@ -38,7 +38,7 @@ async def main():
     app.add_handler(CommandHandler("test", test_webhook))
 
     # 🔔 LOG WEBHOOK URL
-    print(f"Webhook URL test 3: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
+    print(f"Webhook URL test 8: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
 
     # 🌐 Spuštění webhooku
     print("Spouštím run_webhook()...")
@@ -64,7 +64,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
 # hlavní část (není async!)
 if __name__ == "__main__":
-    print(f"Webhook URL test 7: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
+    print(f"Webhook URL test 8: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
     
     import asyncio
     asyncio.get_event_loop().run_until_complete(main())
