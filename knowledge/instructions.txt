@@ -1,3 +1,6 @@
+Co je to Shark?
+Shark je automatický obchodní systém (Expert Advisor) od 4ROBOTIX.
+
 Co je GtRSI?
 GtRSI je indikátor pro vstup do gridových obchodů podle RSI.
 
