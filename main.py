@@ -11,6 +11,8 @@ from telegram.ext import (
 )
 from knowledge.qa import get_answer
 from logs.logger import log_interaction, log_unanswered
+from telegram.request import HTTPXRequest
+from telegram.error import TelegramError
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]
@@ -18,7 +20,8 @@ WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]
 logging.basicConfig(level=logging.INFO)
 
 # === Vytvoření telegramové aplikace ===
-app = Application.builder().token(BOT_TOKEN).build()
+request = HTTPXRequest(pool_limits=10)  # 10 současných spojení místo výchozích 100ms timeoutů
+app = Application.builder().token(BOT_TOKEN).request(request).build()
 
 # === Telegram Handlers ===
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -39,6 +42,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def test_webhook(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("Zachycen testovací zpráva přes webhook.")
     await update.message.reply_text("Webhook funguje!")
+
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logging.error(f"Exception while handling update {update}: {context.error}")
+
+app.add_error_handler(error_handler)
 
 # Přidání handlerů
 app.add_handler(CommandHandler("start", start))
