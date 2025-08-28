@@ -30,7 +30,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # hlavní část (není async!)
 if __name__ == "__main__":
-    print(f"Webhook URL test 3: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
+    print(f"Webhook URL test 4: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
