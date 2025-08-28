@@ -1,8 +1,8 @@
 Co je to Shark?
 Shark je automatický obchodní systém (Expert Advisor) od 4ROBOTIX.
 
-Co je GtRSI? Jak funguje GtRSI? Co dělá GtRSI?
+Co je GtRSI, Jak funguje GtRSI, Co dělá GtRSI
 GtRSI je indikátor pro vstup do gridových obchodů podle RSI.
 
-Jak funguje AutoClose?
+Jak funguje AutoClose, co je AutoClose, co dělá AutoClose
 AutoClose zavírá nejstarší obchody, když je dosažen maximální počet obchodů v sérii.
