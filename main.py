@@ -1,4 +1,7 @@
 import os
+import nest_asyncio
+nest_asyncio.apply()
+
 from telegram import Update
 from telegram.ext import (
     Application, ApplicationBuilder, CommandHandler, MessageHandler,
@@ -64,7 +67,7 @@ if __name__ == "__main__":
     print(f"Webhook URL test 7: {RENDER_EXTERNAL_URL}/webhook/{WEBHOOK_SECRET_PATH}")
     
     import asyncio
-    asyncio.run(main())
+    asyncio.get_event_loop().run_until_complete(main())
     
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     
