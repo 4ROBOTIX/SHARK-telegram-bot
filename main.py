@@ -1,7 +1,8 @@
-print("==== SPUŠTĚNA VERZE TEST 14 ====")
+print("==== SPUŠTĚNA VERZE TEST 15 ====")
 
 import os
 import logging
+import asyncio
 from flask import Flask, request
 from telegram import Update
 from telegram.ext import (
@@ -16,6 +17,7 @@ WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]
 
 logging.basicConfig(level=logging.INFO)
 
+# === Vytvoření telegramové aplikace ===
 app = Application.builder().token(BOT_TOKEN).build()
 
 # === Telegram Handlers ===
@@ -46,14 +48,22 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 # === Flask server ===
 flask_app = Flask(__name__)
 
+# === Zajištění inicializace Application ===
+is_initialized = False
+
 @flask_app.route(f"/webhook/{WEBHOOK_SECRET_PATH}", methods=["POST"])
 async def webhook():
-    if request.method == "POST":
-        data = request.get_json(force=True)
-        update = Update.de_json(data, app.bot)
-        await app.process_update(update)
-        return "OK"
+    global is_initialized
+    if not is_initialized:
+        await app.initialize()  # 🔧 nutné pro webhook
+        is_initialized = True
 
+    data = request.get_json(force=True)
+    update = Update.de_json(data, app.bot)
+    await app.process_update(update)
+    return "OK"
+
+# === Spuštění Flask serveru ===
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     flask_app.run(host="0.0.0.0", port=port)
