@@ -4,7 +4,6 @@ from telegram.ext import (
     Application, ApplicationBuilder, CommandHandler, MessageHandler,
     ContextTypes, filters
 )
-from flask import Flask, request
 from knowledge.qa import get_answer
 from logs.logger import log_interaction, log_unanswered
 
