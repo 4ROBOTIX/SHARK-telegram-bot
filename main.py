@@ -65,9 +65,12 @@ loop = asyncio.get_event_loop()
 @flask_app.route(f"/webhook/{WEBHOOK_SECRET_PATH}", methods=["POST"])
 def webhook():
     if request.method == "POST":
+        print("📩 Přišla zpráva přes webhook")
         data = request.get_json(force=True)
         update = Update.de_json(data, app.bot)
 
+        print(f"📨 Zpráva od: {update.effective_user.username} - {update.effective_message.text}")
+        
         # Spuštění async úlohy bezpečně v hlavní asyncio smyčce
         asyncio.run_coroutine_threadsafe(app.process_update(update), loop)
 
@@ -75,10 +78,14 @@ def webhook():
 
 # === Spuštění Flask serveru ===
 if __name__ == "__main__":
+    # Inicializace telegram aplikace (nutná pro process_update)
+    loop.run_until_complete(app.initialize())
+    
     import threading
 
     # Spusť asyncio loop ve vlákně
     def run_loop():
+        print("✅ Asyncio event loop běží...")
         loop.run_forever()
 
     threading.Thread(target=run_loop).start()
