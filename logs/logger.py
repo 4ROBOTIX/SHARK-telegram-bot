@@ -53,4 +53,5 @@ def log_unanswered(username, user_input, user_id=None):
 
     data.append(log_entry)
 
-    with open(UNANSWERED_FILE, "w",_
+    with open(UNANSWERED_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
