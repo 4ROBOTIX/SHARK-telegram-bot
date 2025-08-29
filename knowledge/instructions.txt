@@ -1,5 +1,11 @@
+Ahoj, dobrý den, čau, zdravím
+Ahoj! Jsem Rafael, 4ROBOTIX asistent. Co Tě zajímá?
+
 Shark
 Shark je automatický obchodní systém (Expert Advisor) od 4ROBOTIX.
+
+4ROBOTIX
+4ROBOTIX je softwarový tým, který se zabývá automatizacemi. Vytvořil i Shark Expert Advisor pro Forex trading.
 
 GtRSI
 GtRSI je indikátor pro vstup do gridových obchodů podle RSI.
