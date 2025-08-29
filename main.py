@@ -30,18 +30,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_input = update.message.text
     answer = get_answer(user_input)
-
-    log_interaction(
-        username=update.message.from_user.username,
-        user_input=user_input,
-        answer=answer,
-        user_id=update.message.from_user.id
-    )
-
+    
     if answer:
         await update.message.reply_text(answer)
+        log_interaction(
+            username=update.message.from_user.username,
+            user_input=user_input,
+            answer=answer,
+            user_id=update.message.from_user.id
+        )
     else:
         await update.message.reply_text("Omlouvám se, na to zatím neznám odpověď.")
+        log_interaction(  # <-- Přidá se do hlavního logu i s odpovědí None
+            username=update.message.from_user.username,
+            user_input=user_input,
+            answer=None,
+            user_id=update.message.from_user.id
+        )
         log_unanswered(
             username=update.message.from_user.username,
             user_input=user_input,
