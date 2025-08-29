@@ -31,13 +31,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_input = update.message.text
     answer = get_answer(user_input)
 
-    log_interaction(update.message.from_user.username, user_input, answer)
+    log_interaction(
+        username=update.message.from_user.username,
+        user_input=user_input,
+        answer=answer,
+        user_id=update.message.from_user.id
+    )
 
     if answer:
         await update.message.reply_text(answer)
     else:
         await update.message.reply_text("Omlouvám se, na to zatím neznám odpověď.")
-        log_unanswered(update.message.from_user.username, user_input)
+        log_unanswered(
+            username=update.message.from_user.username,
+            user_input=user_input,
+            user_id=update.message.from_user.id
+        )
 
 async def test_webhook(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("Zachycen testovací zpráva přes webhook.")
