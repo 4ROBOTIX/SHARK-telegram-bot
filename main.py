@@ -34,15 +34,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 1. Pokud operátor napíše "/leave", ukonči přepojení
     if user_id == OPERATOR_ID and message.lower() == "/leave":
-        if active_sessions:
-            ended_users = ", ".join(str(uid) for uid in active_sessions)
-            active_sessions.clear()
+        target_id = transferred_users.get(OPERATOR_ID)
+        if target_id and target_id in active_sessions:
+            active_sessions.remove(target_id)
             transferred_users.pop(OPERATOR_ID, None)
-            await update.message.reply_text("✅ Konverzace ukončena. Bot opět odpovídá.")
-            return
+            await update.message.reply_text(f"✅ Přepojení na uživatele {target_id} ukončeno.")
         else:
-            await update.message.reply_text("❌ Žádná aktivní konverzace.")
-            return
+            await update.message.reply_text("❌ Aktuálně nejsi připojen k žádnému uživateli.")
+        return
 
     # 2. Pokud odpovídá operátor (na někoho přepojeného)
     if user_id == OPERATOR_ID and OPERATOR_ID in transferred_users:
