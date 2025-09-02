@@ -87,8 +87,6 @@ logging.basicConfig(level=logging.INFO)
 telegram_request = HTTPXRequest(http_version="1.1")  # ✅ Jiný název proměnné
 app = Application.builder().token(BOT_TOKEN).request(telegram_request).build()
 
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
 # === Telegram Handlers ===
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Ahoj, jsem Rafael, 4ROBOTIX asistent. Jak mohu pomoci?")
