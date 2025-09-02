@@ -10,7 +10,7 @@ from telegram.ext import (
     ContextTypes, filters
 )
 from knowledge.qa import get_answer
-from logs.logger import log_interaction, log_unanswered
+from logs.logger import log_interaction
 from telegram.request import HTTPXRequest
 from telegram.error import TelegramError
 
