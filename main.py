@@ -76,13 +76,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=OPERATOR_ID, text=f"🚨 {username} ({user_id}) položil dotaz, na který neznám odpověď: '{message}'")
         log_interaction(username, message, "Odpověď neznáma - přepojuji", user_id)
         context.chat_data["transferred_to"] = user_id
-
-# a pak klasicky handler:
-
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 # === KONEC UPDATU ===
-
-
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 WEBHOOK_SECRET_PATH = os.environ["WEBHOOK_SECRET_PATH"]
@@ -92,6 +86,8 @@ logging.basicConfig(level=logging.INFO)
 # === Vytvoření telegramové aplikace ===
 telegram_request = HTTPXRequest(http_version="1.1")  # ✅ Jiný název proměnné
 app = Application.builder().token(BOT_TOKEN).request(telegram_request).build()
+
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
 # === Telegram Handlers ===
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
