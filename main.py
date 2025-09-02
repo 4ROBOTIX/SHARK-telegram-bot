@@ -18,6 +18,7 @@ from telegram.error import TelegramError
 # ID operátora (Jaro)
 OPERATOR_ID = 890406338
 active_sessions = set()  # sem se ukládají ID uživatelů, kteří jsou přepojeni
+transferred_users = {}  # Mapa: operátor → aktuálně obsluhovaný uživatel
 
 # Fráze pro ruční přepojení
 TRANSFER_KEYWORDS = [
@@ -36,6 +37,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if active_sessions:
             ended_users = ", ".join(str(uid) for uid in active_sessions)
             active_sessions.clear()
+            transferred_users.pop(OPERATOR_ID, None)
             await update.message.reply_text("✅ Konverzace ukončena. Bot opět odpovídá.")
             return
         else:
@@ -43,8 +45,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
     # 2. Pokud odpovídá operátor (na někoho přepojeného)
-    if user_id == OPERATOR_ID and context.chat_data.get("transferred_to"):
-        target_id = context.chat_data["transferred_to"]
+    if user_id == OPERATOR_ID and OPERATOR_ID in transferred_users:
+        target_id = transferred_users[OPERATOR_ID]
         await context.bot.send_message(chat_id=target_id, text=message)
         log_interaction("OPERATOR", f"{username} → {target_id}: {message}", "odesláno operátorem", user_id)
         return
@@ -52,7 +54,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 3. Pokud je uživatel přepojen na operátora
     if user_id in active_sessions:
         await context.bot.send_message(chat_id=OPERATOR_ID, text=f"{username} ({user_id}): {message}")
-        context.chat_data["transferred_to"] = user_id
+        # context.chat_data["transferred_to"] = user_id
+        transferred_users[OPERATOR_ID] = user_id
         log_interaction(username, message, "přesměrováno na operátora", user_id)
         return
 
